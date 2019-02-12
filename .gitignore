@@ -24,3 +24,7 @@ build/classes/snakegame/SnakeGame\.class
 dist/README\.TXT
 
 dist/SnakeGame\.jar
+
+build/
+
+nbproject/private/

@@ -14,6 +14,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.util.Random;
+import java.util.stream.IntStream;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -45,12 +46,16 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
     private Timer timer;
     private int delay = 100;
     
-    private int[] enemyYPos ={25,50,75,100,125,150,175,200,225,250,275,300,325,350,375,400,425,450,475,500,525,550,575,600,625,650,675,700,725,750,775,800};
-    private int[] enemyXPos ={25,50,75,100,125,150,175,200,225,250,275,300,325,350,375,400,425,450,475,500,525,550,575,600,625,650,675,700,725,750,775,800};
+    //private int[] enemyYPos ={25,50,75,100,125,150,175,200,225,250,275,300,325,350,375,400,425,450,475,500,525,550,575,600,625,650,675,700,725,750,775,800};
+    //private int[] enemyXPos ={25,50,75,100,125,150,175,200,225,250,275,300,325,350,375,400,425,450,475,500,525,550,575,600,625,650,675,700,725,750,775,800};
+    
+    //private int[] enemyYPos = new int[33];
+    private int[] enemyYPos = IntStream.iterate(25, n -> n + 25).limit(32).toArray();
+    private int[] enemyXPos = IntStream.iterate(25, n -> n + 25).limit(24).toArray();
     
     private ImageIcon enemyImage;
     private Random rand = new Random();
-    private int xpos = rand.nextInt(34);
+    private int xpos = rand.nextInt(31);
     private int ypos = rand.nextInt(23);
     
     private int score = 0;
@@ -60,9 +65,22 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
     private ImageIcon titleImage;
 
     public Gameplay() {
+        System.out.println("enemyYPos 0 index value: "+enemyYPos[0]);
+        System.out.println("enemyYPos length: "+enemyYPos.length);
+        System.out.println("enemyYPos 0 index value: "+enemyXPos[0]);
+        System.out.println("enemyYPos length: "+enemyXPos.length);
+        System.out.println(""+xpos+" "+ypos);
         addKeyListener(this);
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
+        
+//        for (int i = 0; i < enemyYPos.length; i++) {
+//            System.out.println(""+enemyYPos[i]);
+//        }
+        for (int i = 0; i < enemyXPos.length; i++) {
+            System.out.println(""+enemyXPos[i]);
+        }
+        
         timer = new Timer(delay, this);
         timer.start();
     }
@@ -136,7 +154,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
         if (enemyXPos[xpos] == snakeXlength[0] && enemyYPos[ypos] == snakeYlength[0]) {
             score++;
             lengthOfSnake++;
-            xpos = rand.nextInt(34);
+            xpos = rand.nextInt(31);
             ypos = rand.nextInt(23);
         }
         

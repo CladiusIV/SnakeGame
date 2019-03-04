@@ -28,7 +28,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
     // Folder of the image assets
     static final File dirImages = new File("src/img");
 
-    private int[] snakeXlength = new int[750];
+    private int[] snakeXlength = new int[750]; //Check these arrays, wrong values?
     private int[] snakeYlength = new int[700];
 
     private boolean left = false;
@@ -50,13 +50,14 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
     //private int[] enemyXPos ={25,50,75,100,125,150,175,200,225,250,275,300,325,350,375,400,425,450,475,500,525,550,575,600,625,650,675,700,725,750,775,800};
     
     //private int[] enemyYPos = new int[33];
-    private int[] enemyYPos = IntStream.iterate(25, n -> n + 25).limit(32).toArray();
-    private int[] enemyXPos = IntStream.iterate(25, n -> n + 25).limit(24).toArray();
+    private int matrixValueX = 30, matrixValueY = 22 ;
+    private int[] enemyYPos = IntStream.iterate(25, n -> n + 25).limit(matrixValueX).toArray();
+    private int[] enemyXPos = IntStream.iterate(25, n -> n + 25).limit(matrixValueY).toArray();
     
     private ImageIcon enemyImage;
     private Random rand = new Random();
-    private int xpos = rand.nextInt(31);
-    private int ypos = rand.nextInt(23);
+    private int xpos = rand.nextInt(matrixValueX);
+    private int ypos = rand.nextInt(matrixValueY);
     
     private int score = 0;
     private int moves = 0;
@@ -65,11 +66,14 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
     private ImageIcon titleImage;
 
     public Gameplay() {
+        
+        //Print Positions for testing
         System.out.println("enemyYPos 0 index value: "+enemyYPos[0]);
         System.out.println("enemyYPos length: "+enemyYPos.length);
-        System.out.println("enemyYPos 0 index value: "+enemyXPos[0]);
-        System.out.println("enemyYPos length: "+enemyXPos.length);
+        System.out.println("enemyXPos 0 index value: "+enemyXPos[0]);
+        System.out.println("enemyXPos length: "+enemyXPos.length);
         System.out.println(""+xpos+" "+ypos);
+        System.out.println(""+snakeXlength.length+" "+ snakeXlength[30]);
         addKeyListener(this);
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
@@ -77,9 +81,9 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
 //        for (int i = 0; i < enemyYPos.length; i++) {
 //            System.out.println(""+enemyYPos[i]);
 //        }
-        for (int i = 0; i < enemyXPos.length; i++) {
-            System.out.println(""+enemyXPos[i]);
-        }
+//        for (int i = 0; i < enemyXPos.length; i++) {
+//            System.out.println(""+enemyXPos[i]);
+//        }
         
         timer = new Timer(delay, this);
         timer.start();
@@ -87,6 +91,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
 
     public void paint(Graphics g) {
         
+        //Set the start state of the snake
         if (moves == 0) {
             snakeXlength[2] = 50;
             snakeXlength[1] = 75;
@@ -96,6 +101,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
             snakeYlength[1] = 100;
             snakeYlength[0] = 100;
         }
+        
         // Draw title image border
         g.setColor(Color.WHITE);
         g.drawRect(24, 10, 851, 55);
@@ -117,7 +123,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
         g.setFont(new Font("arial", Font.PLAIN, 14));
         g.drawString("Score: "+score, 780, 30);
         
-        // Draw score length
+        // Draw score of snake length
         g.setColor(Color.YELLOW);
         g.setFont(new Font("arial", Font.PLAIN, 14));
         g.drawString("Length: "+lengthOfSnake, 780, 50);
@@ -125,6 +131,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
         rightMouth = new ImageIcon(dirImages + "/rightmouth.png");
         rightMouth.paintIcon(this, g, snakeXlength[0], snakeYlength[0]);
 
+        //Draw snake images and attach into the array, index[0] for the head
         for (int i = 0; i < lengthOfSnake; i++) {
             if (i == 0 && right) {
                 rightMouth = new ImageIcon(dirImages + "/rightmouth.png");
@@ -149,15 +156,18 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
             }
         }
 
+        //Create enemy and set an image
         enemyImage = new ImageIcon(dirImages + "/enemy.png");
         
-        if (enemyXPos[xpos] == snakeXlength[0] && enemyYPos[ypos] == snakeYlength[0]) {
+        //Set random position of enemy
+        if (enemyXPos[xpos] == snakeXlength[0] && enemyYPos[ypos] == snakeYlength[0]) {  //Array index out of bounds exception
             score++;
             lengthOfSnake++;
-            xpos = rand.nextInt(31);
-            ypos = rand.nextInt(23);
+            xpos = rand.nextInt(matrixValueX);
+            ypos = rand.nextInt(matrixValueY);
         }
         
+        //Draw enemy
         enemyImage.paintIcon(this, g, enemyXPos[xpos], enemyYPos[ypos]);
         
         for (int i = 1; i < lengthOfSnake; i++) {
@@ -186,6 +196,8 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
+        
+        //Restart if space key pressed
         if (e.getKeyCode() == KeyEvent.VK_SPACE) {
             moves = 0;
             score = 0;
@@ -193,6 +205,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
             repaint();
         }
         
+        //Key press passed as boolean
         if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
             moves++;
             right = true;
@@ -251,6 +264,8 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         timer.start();
+        
+        //Movement of the snake
         if (right) {
             for (int i = lengthOfSnake-1; i >=0 ; i--) {
                 snakeYlength[i+1] = snakeYlength[i];
@@ -261,7 +276,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
                 } else {
                     snakeXlength[i] = snakeXlength[i-1];
                 }
-                if (snakeXlength[i] > 850) {
+                if (snakeXlength[i] > 750) { //Changed from 850
                     snakeXlength[i] = 25;
                 }
             }
@@ -278,7 +293,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
                     snakeXlength[i] = snakeXlength[i-1];
                 }
                 if (snakeXlength[i] < 25) {
-                    snakeXlength[i] = 850;
+                    snakeXlength[i] = 750; //Changed from 850
                 }
             }
             repaint();
@@ -293,7 +308,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
                 } else {
                     snakeYlength[i] = snakeYlength[i-1];
                 }
-                if (snakeYlength[i] > 850) {
+                if (snakeYlength[i] > 700) { //Changed from 850
                     snakeYlength[i] = 75;
                 }
             }
@@ -310,7 +325,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
                     snakeYlength[i] = snakeYlength[i-1];
                 }
                 if (snakeYlength[i] < 25) {
-                    snakeYlength[i] = 850;
+                    snakeYlength[i] = 700; //Changed from 850
                 }
             }
             repaint();
